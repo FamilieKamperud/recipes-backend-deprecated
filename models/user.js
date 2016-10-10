@@ -153,7 +153,7 @@ User.prototype.del = function (callback) {
         'OPTIONAL MATCH (user) -[rel:follows]- (other)',
         'DELETE user, rel',
     ].join('\n')
-
+ 
     var params = {
         username: this.username,
     };

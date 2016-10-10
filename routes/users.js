@@ -15,8 +15,13 @@ function getUserURL(user) {
  */
 exports.list = function (req, res, next) {
     User.getAll(function (err, users) {
-        if (err) return next(err);
-        res.json({ users: users });
+      if (err) {
+          return res.status(400).json({
+            username: req.body.username,
+            error: err.message,
+          });
+      }
+      res.json({ users: users });
     });
 };
 
@@ -28,7 +33,7 @@ exports.create = function (req, res, next) {
         username: req.body.username
     }, function (err, user) {
         if (err) {
-            res.status(400).json({
+            return res.status(400).json({
               username: req.body.username,
               error: err.message,
             });
@@ -43,7 +48,7 @@ exports.create = function (req, res, next) {
 exports.show = function (req, res, next) {
     User.get(req.params.username, function (err, user) {
         if (err) {
-          res.status(404).json({
+          return res.status(404).json({
             error: err.message,
             username: req.params.username
           });
@@ -65,14 +70,14 @@ exports.show = function (req, res, next) {
 exports.edit = function (req, res, next) {
     User.get(req.params.username, function (err, user) {
         if (err) {
-          res.status(404).json({
+          return res.status(404).json({
             error: err.message,
             username: req.params.username
           });
         }
         user.patch(req.body, function (err) {
           if (err) {
-            res.status(400).json({
+            return res.status(400).json({
               error: err.message,
               username: req.params.username
             });
@@ -87,13 +92,22 @@ exports.edit = function (req, res, next) {
  */
 exports.del = function (req, res, next) {
     User.get(req.params.username, function (err, user) {
-        // TODO: Gracefully handle "no such user" error somehow.
-        // E.g. redirect back to /users with an info message?
-        if (err) return next(err);
-        user.del(function (err) {
-            if (err) return next(err);
-            res.redirect('/users');
+      if (err) {
+        console.log(err);
+        return res.status(404).json({
+          error: err.message,
+          username: req.params.username
         });
+      }
+      user.del(function (err) {
+        if (err) {
+          return res.status(400).json({
+            error: err.message,
+            username: req.params.username
+          });
+        }
+        res.status(204).json();
+      });
     });
 };
 
@@ -102,19 +116,35 @@ exports.del = function (req, res, next) {
  */
 exports.follow = function (req, res, next) {
     User.get(req.params.username, function (err, user) {
-        // TODO: Gracefully handle "no such user" error somehow.
-        // This is the source user, so e.g. 404 page?
-        if (err) return next(err);
-        User.get(req.body.otherUsername, function (err, other) {
-            // TODO: Gracefully handle "no such user" error somehow.
-            // This is the target user, so redirect back to the source user w/
-            // an info message?
-            if (err) return next(err);
-            user.follow(other, function (err) {
-                if (err) return next(err);
-                res.redirect(getUserURL(user));
-            });
+      if (err) {
+        console.log(err);
+        return res.status(404).json({
+          error: err.message,
+          username: req.params.username
         });
+      }
+      User.get(req.body.otherUsername, function (err, other) {
+        if (err) {
+          console.log(err);
+          return res.status(404).json({
+            error: err.message,
+            username: req.body.otherUsername
+          });
+        }
+        user.follow(other, function (err) {
+          if (err) {
+            return res.status(400).json({
+              error: err.message,
+              username: req.params.username,
+              other: req.body.otherUsername
+            });
+          }
+          res.json({
+            follower:user,
+            followed: other
+          });
+        });
+      });
     });
 };
 
@@ -122,19 +152,35 @@ exports.follow = function (req, res, next) {
  * POST /users/:username/unfollow {otherUsername}
  */
 exports.unfollow = function (req, res, next) {
-    User.get(req.params.username, function (err, user) {
-        // TODO: Gracefully handle "no such user" error somehow.
-        // This is the source user, so e.g. 404 page?
-        if (err) return next(err);
-        User.get(req.body.otherUsername, function (err, other) {
-            // TODO: Gracefully handle "no such user" error somehow.
-            // This is the target user, so redirect back to the source user w/
-            // an info message?
-            if (err) return next(err);
-            user.unfollow(other, function (err) {
-                if (err) return next(err);
-                res.redirect(getUserURL(user));
-            });
+  User.get(req.params.username, function (err, user) {
+    if (err) {
+      console.log(err);
+      return res.status(404).json({
+        error: err.message,
+        username: req.params.username
+      });
+    }
+    User.get(req.body.otherUsername, function (err, other) {
+      if (err) {
+        console.log(err);
+        return res.status(404).json({
+          error: err.message,
+          username: req.body.otherUsername
         });
+      }
+      user.unfollow(other, function (err) {
+        if (err) {
+          return res.status(400).json({
+            error: err.message,
+            username: req.params.username,
+            other: req.body.otherUsername
+          });
+        }
+        res.json({
+          follower:user,
+          unfollowed: other
+        });
+      });
+      });
     });
 };
