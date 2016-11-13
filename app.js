@@ -34,6 +34,12 @@ app.locals({
 
 app.get('/', routes.site.index);
 
+app.get('/recipes', routes.recipes.list);
+app.post('/recipes', routes.recipes.create);
+app.get('/recipes/:recipe', routes.recipes.show);
+app.put('/recipes/:recipe', routes.recipes.edit);
+app.del('/recipes/:recipe', routes.recipes.del);
+
 app.get('/users', routes.users.list);
 app.post('/users', routes.users.create);
 app.get('/users/:username', routes.users.show);
