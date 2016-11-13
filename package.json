@@ -2,7 +2,6 @@
   "name": "node-neo4j-template",
   "description": "A sample Node.js + Neo4j app.",
   "version": "0.0.0",
-  "author": "Aseem Kishore <aseem.kishore@gmail.com>",
   "private": true,
   "dependencies": {
     "express": "3.2.0",
@@ -18,6 +17,7 @@
     "node": "0.10.x"
   },
   "scripts": {
+    "neo4j": "neo4j start",
     "start": "NEO4J_AUTH=neo4j:password node-dev app.js",
     "test": "mocha test/*/*.js"
   }
