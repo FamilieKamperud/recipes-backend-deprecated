@@ -48,27 +48,6 @@ npm test
 
 ## Deploying
 
-This app is running on Heroku, using the free version of the
-[GrapheneDB add-on](https://addons.heroku.com/graphenedb):
-
-<https://node-neo4j-template.herokuapp.com/>
-
-You can run your own instance similarly for free:
-
-[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
-
-If you prefer to deploy this sample app manually, these are the steps:
-
-```
-heroku create [your-app-name]
-heroku addons:add graphenedb
-git push heroku master
-```
-
-There's already a [Procfile](./Procfile) here, and the code already checks for the
-necessary `PORT` and `GRAPHENEDB_URL` environment variables,
-so your deploy should go off without a hitch!
-
 If you're deploying in another way, the code also checks for a `NEO4J_URL`
 environment variable to support pointing to any other Neo4j database.
 The value of this variable should be set to the database root URL, and it can
@@ -83,14 +62,15 @@ Edit `scripts.start` in [package.json](./package.json) if you need to change tha
 ## Miscellany
 
 - MIT license.
-- Questions/comments/etc. are welcome.
-- As an exercise, I built this without using [CoffeeScript][coffeescript] or
-  [Streamline][streamline]. What a gigantic pain! Never again. =P
 
 
 [Node.js]: http://nodejs.org/
 [Neo4j]: http://www.neo4j.org/
 [node-neo4j]: https://github.com/thingdom/node-neo4j
 
-[coffeescript]: http://www.coffeescript.org/
-[streamline]: https://github.com/Sage/streamlinejs
+## TODO
+
+- Security (frontend and API)
+- Backup (neo4j database)
+- Test/prod environment setup (docker)
+- Continuous deployment (with tests)
